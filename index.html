@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ID Verification</title>
+<style>
+* {
+box-sizing: border-box;
+}
+body {
+margin: 0;
+padding: 0;
+background-color: #000;
+color: #fff;
+font-family: 'Segoe UI', sans-serif;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: flex-start;
+min-height: 100vh;
+padding: 30px 20px;
+}
+
+h1 {
+font-size: 28px;
+text-align: center;
+margin-bottom: 10px;
+}
+
+p {
+font-size: 16px;
+text-align: center;
+margin-bottom: 20px;
+max-width: 600px;
+}
+
+.button-container {
+display: flex;
+flex-direction: column;
+gap: 15px;
+width: 100%;
+max-width: 300px;
+margin-bottom: 30px;
+}
+
+button {
+padding: 12px;
+font-size: 16px;
+background-color: #1e90ff;
+color: white;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+}
+
+button:hover {
+background-color: #0d6efd;
+}
+
+#preview {
+display: none;
+flex-direction: column;
+align-items: center;
+}
+
+#preview img {
+max-width: 100%;
+height: auto;
+border: 2px solid #555;
+border-radius: 8px;
+margin: 15px 0;
+}
+
+.footer {
+margin-top: auto;
+font-size: 14px;
+color: #888;
+text-align: center;
+padding-top: 30px;
+}
+
+.hidden {
+display: none;
+}
+</style>
+</head>
+<body>
+
+<h1>ID & Passport Verification</h1>
+<p>Please capture or upload both front and back images of your ID or passport. You can retake if the image is not clear.</p>
+
+<div class="button-container">
+<input type="file" accept="image/*" capture="environment" id="cameraInput" class="hidden" />
+<input type="file" accept="image/*" id="fileInput" class="hidden" />
+
+<button onclick="startCapture()">📷 Capture Using Camera</button>
+<button onclick="startUpload()">🗂️ Upload from Device</button>
+</div>
+
+<div id="preview">
+<h3 id="stepTitle">Preview</h3>
+<img id="previewImage" src="#" alt="Preview">
+<div style="margin-top: 10px;">
+<button onclick="confirmImage()">✔️ Confirm</button>
+<button onclick="retakeImage()">🔄 Retake</button>
+</div>
+</div>
+
+<div class="footer">Developed by Mohammed Khalfan ©</div>
+
+<script>
+const cameraInput = document.getElementById("cameraInput");
+const fileInput = document.getElementById("fileInput");
+const preview = document.getElementById("preview");
+const previewImage = document.getElementById("previewImage");
+const stepTitle = document.getElementById("stepTitle");
+
+let method = ""; // 'camera' or 'upload'
+let step = 1; // 1 = front, 2 = back
+let images = {};
+
+function startCapture() {
+method = "camera";
+step = 1;
+stepTitle.innerText = "Capture Front Side";
+cameraInput.click();
+}
+
+function startUpload() {
+method = "upload";
+step = 1;
+stepTitle.innerText = "Upload Front Side";
+fileInput.click();
+}
+
+function handleFile(file) {
+if (file) {
+const reader = new FileReader();
+reader.onload = function(e) {
+previewImage.src = e.target.result;
+preview.style.display = "flex";
+};
+reader.readAsDataURL(file);
+}
+}
+
+function confirmImage() {
+images[step === 1 ? "front" : "back"] = previewImage.src;
+preview.style.display = "none";
+
+if (step === 1) {
+step = 2;
+stepTitle.innerText = method === "camera" ? "Capture Back Side" : "Upload Back Side";
+method === "camera" ? cameraInput.click() : fileInput.click();
+} else {
+alert("✅ Both images have been successfully added!");
+console.log("Front Image:", images.front);
+console.log("Back Image:", images.back);
+}
+}
+
+function retakeImage() {
+preview.style.display = "none";
+method === "camera" ? cameraInput.click() : fileInput.click();
+}
+
+cameraInput.addEventListener("change", (e) => handleFile(e.target.files[0]));
+fileInput.addEventListener("change", (e) => handleFile(e.target.files[0]));
+</script>
+
+</body>
+</html>
